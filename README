@@ -1,0 +1,22 @@
+Perfect play AI for BvS Number One (animecubed.com/billy)
+
+Requirements:
+
+Some version of lp_solve
+A compiler with decent C++11 support
+
+Instructions (for Ubuntu Linux)
+
+sudo apt-get install liblpsolve55-dev build-essential
+make
+
+
+Important functions:
+
+game_state.cc:act() implements the actual game mechanics
+zs_wrap.cc:zs_solve_() solves a zero-sum game as a linear program
+number_one_main.cc:moonburst_loop() runs the input loop
+eval_state.cc:eval_state() calculates the probability of winning
+              get_strat() returns a move chosen from subgame perfect equilibrium
+              distribution
+              get_doubletime_strat() does what you'd expect.

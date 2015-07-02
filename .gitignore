@@ -1,0 +1,6 @@
+*~
+*.o
+*.d
+\#*\#
+number_one_main
+n1bot_data.bin
