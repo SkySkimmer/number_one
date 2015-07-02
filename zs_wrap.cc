@@ -46,7 +46,7 @@ double* zs_solve(int nRows, int nCols, double *payoffMatrix) {
   // reverse every row of the payoff matrix (i mean yeah, i could reverse
   // the columns too but there's not any point to it)
   // #totallytestedcode #yolo
-  double *revPayoffMatrix = reintepret_cast<double *>(
+  double *revPayoffMatrix = reinterpret_cast<double *>(
                               malloc(nRows * nCols * sizeof(double)));
   for (int i = 0; i < nRows; ++i) {
     // copy reversed row to buffer
