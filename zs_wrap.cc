@@ -1,15 +1,17 @@
 // Solves a zero-sum game using lp_solve
-#include <cstdlib>
-#include <lpsolve/lp_lib.h>
+#include "zs_wrap.h"
 
+#include <lpsolve/lp_lib.h>
+#include <cstdlib>
 #include <iostream>
+
 
 double* zs_solve_(int nRows, int nCols, double *payoffMatrix) {
   lprec *lp;
   lp = make_lp(0, nCols);
   set_verbose(lp, IMPORTANT);
   // Objective function is simply the sum of all the variables
-  double *tmp = (double *) malloc((nCols + 1) * sizeof(double));
+  double *tmp = reinterpret_cast<double *>(malloc((nCols + 1)*sizeof(double)));
   for (int i = 1; i < nCols + 1; ++i) {
     tmp[i] = 1;
   }
@@ -41,25 +43,27 @@ double* zs_solve_(int nRows, int nCols, double *payoffMatrix) {
 }
 
 double* zs_solve(int nRows, int nCols, double *payoffMatrix) {
-	// reverse every row of the payoff matrix (i mean yeah, i could reverse
-	// the columns too but there's not any point to it)
-	// #totallytestedcode #yolo
-	double *revPayoffMatrix = (double *) malloc(nRows * nCols * sizeof(double));
-	for (int i = 0; i < nRows; ++i) {
-		// copy reversed row to buffer
-		for (int j = 0; j < nCols; ++j) {
-			revPayoffMatrix[i * nCols + j] = payoffMatrix[(i + 1) * nCols - j - 1];
-		}
-	}
-	// send it off to already existing thing
-	double *result = zs_solve_(nRows, nCols, revPayoffMatrix);
-	free(revPayoffMatrix);
-	// then reverse the probability distribution before sending it back
-	double *revresult = (double *) malloc((nCols + 1) * sizeof(double));
-	revresult[0] = result[0];
-	for (int i = 1; i <= nCols; ++i) {
-		revresult[i] = result[nCols + 1 - i];
-	}
-	free(result);
-	return revresult;
+  // reverse every row of the payoff matrix (i mean yeah, i could reverse
+  // the columns too but there's not any point to it)
+  // #totallytestedcode #yolo
+  double *revPayoffMatrix = reintepret_cast<double *>(
+                              malloc(nRows * nCols * sizeof(double)));
+  for (int i = 0; i < nRows; ++i) {
+    // copy reversed row to buffer
+    for (int j = 0; j < nCols; ++j) {
+      revPayoffMatrix[i * nCols + j] = payoffMatrix[(i + 1) * nCols - j - 1];
+    }
+  }
+  // send it off to already existing thing
+  double *result = zs_solve_(nRows, nCols, revPayoffMatrix);
+  free(revPayoffMatrix);
+  // then reverse the probability distribution before sending it back
+  double *revresult = reinterpret_cast<double *>(
+                        malloc((nCols + 1) * sizeof(double)));
+  revresult[0] = result[0];
+  for (int i = 1; i <= nCols; ++i) {
+    revresult[i] = result[nCols + 1 - i];
+  }
+  free(result);
+  return revresult;
 }

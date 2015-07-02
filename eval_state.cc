@@ -50,9 +50,9 @@ double eval_state(const struct game_state &s) {
   // call zs_solve on it
 
   // we have s.p1.bullets + 2 columns and s.p2.bullets + 2 rows
-  double *payoffMatrix = (double *) malloc( (s.p1.bullets + 2) *
-                                            (s.p2.bullets + 2) *
-                                            sizeof(double));
+  double *payoffMatrix = reinterpret_cast<double *>(malloc((s.p1.bullets + 2) *
+                                                           (s.p2.bullets + 2) *
+                                                           sizeof(double)));
   for (int p2Move = -1; p2Move <= s.p2.bullets; p2Move++) {
     int offset = (p2Move + 1) * (s.p1.bullets + 2);
     for (int p1Move = -1; p1Move <= s.p1.bullets; p1Move++) {
@@ -72,12 +72,12 @@ double eval_state(const struct game_state &s) {
     exit(-1);
   }
   results[0] -= 1;
-  
+
   if (results[0] < 0.00000001) {
-	  results[0] = 0;
+          results[0] = 0;
   }
   if (results[0] > 1) {
-	  results[0] = 1;
+          results[0] = 1;
   }
   double value = results[0];
   free(results);
@@ -113,9 +113,9 @@ void get_strat(const struct game_state &s) {
     return;
   }
 
-  double *payoffMatrix = (double *) malloc( (s.p1.bullets + 2) *
-                                            (s.p2.bullets + 2) *
-                                            sizeof(double));
+  double *payoffMatrix = reinterpret_cast<double *>(malloc((s.p1.bullets + 2) *
+                                                           (s.p2.bullets + 2) *
+                                                           sizeof(double)));
   for (int p2Move = -1; p2Move <= s.p2.bullets; p2Move++) {
     int offset = (p2Move + 1) * (s.p1.bullets + 2);
     for (int p1Move = -1; p1Move <= s.p1.bullets; p1Move++) {
@@ -140,11 +140,11 @@ void get_strat(const struct game_state &s) {
     move -= results[1 + i];
     if (move <= 0 || i == s.p1.bullets + 1) {
       // choose the action at i-1
-      if (i == 0) {  // reload
+      if (i == 0) {
         cout << "Reload" << endl;
-      } else if (i == 1) { // block
+      } else if (i == 1) {
         cout << "Block" << endl;
-      } else { // shoot
+      } else {
         cout << "Fire " << i-1 << endl;
       }
       break;
@@ -164,9 +164,9 @@ void get_doubletime_strat(const struct game_state &s) {
     return;
   }
 
-  double *payoffMatrix = (double *) malloc( (s.p1.bullets + 2) *
-                                            (s.p2.bullets + 2) *
-                                            sizeof(double));
+  double *payoffMatrix = reinterpret_cast<double *>(malloc((s.p1.bullets + 2) *
+                                                           (s.p2.bullets + 2) *
+                                                           sizeof(double)));
   for (int p2Move = -1; p2Move <= s.p2.bullets; p2Move++) {
     int offset = (p2Move + 1) * (s.p1.bullets + 2);
     for (int p1Move = -1; p1Move <= s.p1.bullets; p1Move++) {
@@ -177,20 +177,20 @@ void get_doubletime_strat(const struct game_state &s) {
 
   double *results = zs_solve(s.p2.bullets + 2, s.p1.bullets + 2, payoffMatrix);
   if (results[0] - 1 < 0.000001) {
-    cout << "0% to win under optimal play - consider trying something silly" << endl;
+    cout << "Note: You are 0% to win under optimal play" << endl;
   }
-  
+
   double move = distribution(generator);
   for (int i = 0; i < s.p1.bullets + 2; ++i) {
     move -= results[1 + i];
     if (move <= 0 || i == s.p1.bullets + 1) {
       cout << "\tAction: ";
       // choose the action at i-1
-      if (i == 0) {  // reload
+      if (i == 0) {
         cout << "Reload" << endl;
-      } else if (i == 1) { // block
+      } else if (i == 1) {
         cout << "Block" << endl;
-      } else { // shoot
+      } else {
         cout << "Fire " << i-1 << endl;
       }
       cout << "\tDoubletimes" << endl;

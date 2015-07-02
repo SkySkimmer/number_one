@@ -14,22 +14,21 @@ static const string type_names[] = {"Prep", "Catch", "Pierce", "Aura"};
 
 void printState(const struct game_state &state) {
   cout << "Player 1" << endl;
-  cout << "HP: " << state.p1.hp << endl;
-  cout << "Ammo: " << (int) state.p1.bullets << endl;
-  cout << "Fatigue: " << (int) state.p1.fatigue << endl;
+  cout << "HP: " << static_cast<int>(state.p1.hp) << endl;
+  cout << "Ammo: " << static_cast<int>(state.p1.bullets) << endl;
+  cout << "Fatigue: " << static_cast<int>(state.p1.fatigue) << endl;
   cout << "Power: " << type_names[state.p1.type] << endl << endl;
 
   cout << "Player 2" << endl;
-  cout << "HP: " << state.p2.hp << endl;
-  cout << "Ammo: " << (int) state.p2.bullets << endl;
-  cout << "Fatigue: " << (int) state.p2.fatigue << endl;
+  cout << "HP: " << static_cast<int>(state.p2.hp) << endl;
+  cout << "Ammo: " << static_cast<int>(state.p2.bullets) << endl;
+  cout << "Fatigue: " << static_cast<int>(state.p2.fatigue) << endl;
   cout << "Power: " << type_names[state.p2.type] << endl << endl;
 
-  cout << "Round " << (int) state.round << endl;
+  cout << "Round " << static_cast<int>(state.round) << endl;
 }
 
 // MoonBurst is a lazy pony
-// No error checking - if you messed up copy/pasting you deserve whatever you get
 static void moonburst_loop() {
   for (;;) {
     string s, p1power, p2power;
@@ -131,7 +130,7 @@ static void solve_loop() {
     } else if (argv[8] == "aura") {
       state1.p2.type = AURA;
     } else {
-      std::cerr << "Invalid power for player 2" << endl;	
+      std::cerr << "Invalid power for player 2" << endl;
       continue;
     }
     state1.round = stoi(argv[9]);
@@ -142,10 +141,11 @@ static void solve_loop() {
 }
 
 int main() {
-  cout << "N1 bot: ver 0.1.1" << endl;
-  cout << "Copy the match information from the N1 page (N1 Enhancer script compatible)" << endl;
+  cout << "N1 bot: ver 0.1.2" << endl;
+  cout << "Copy the match information from the N1 page (N1 Enhancer script"
+          " compatible)" << endl;
 
-  std::ifstream data_file ("n1bot_data.bin", std::ios::in | std::ios::binary);
+  std::ifstream data_file("n1bot_data.bin", std::ios::in | std::ios::binary);
   if (!data_file) {
     cout << "Data file not found, generating..." << endl;
     dout.reset(new std::ofstream("n1bot_data.bin",
@@ -163,11 +163,17 @@ int main() {
   } else {
     // Read from data file
     int nstates;
-    int state;
-    double winchance;
-    for (nstates = 0;;nstates++) {
-      data_file.read((char *)&state, sizeof(state));
-      data_file.read((char *)&winchance, sizeof(winchance));
+    union {
+      int state;
+      char state_[sizeof(state)];
+    };
+    union {
+      double winchance;
+      char winchance_[sizeof(winchance)];
+    };
+    for (nstates = 0; ; nstates++) {
+      data_file.read(state_, sizeof(state));
+      data_file.read(winchance_, sizeof(winchance));
       if (!data_file)
         break;
       if (state >= 1 << 25 ||
