@@ -15,10 +15,25 @@
 std::unique_ptr<std::ofstream> dout;
 std::unordered_map<int, double> memoization;
 
+struct game_state rev_state(const struct game_state &s) {
+  auto s_(s);
+  std::swap(s_.p1, s_.p2);
+  return s_;
+}
+
+int game_state_rev_rep(const struct game_state &s) {
+  return game_state_rep(rev_state(s));
+}
+
 // Computes the probability that the first player will win
 double eval_state(const struct game_state &s) {
   int state_rep = game_state_rep(s);
-
+  {
+    auto s_rev = rev_state(s);
+    if (state_rep > game_state_rep(s_rev)) {
+      return 1.0 - eval_state(s_rev);
+    }
+  }
   if (memoization.count(state_rep)) {
     // already calculated; return memoized result
     return memoization[state_rep];
