@@ -35,14 +35,14 @@ static void moonburst_loop() {
     int p1hp, p1ammo, p1fat, p2hp, p2ammo, p2fat, round;
     do {
       cin >> s;
-    } while (s != "HP:");
+    } while (s != "HP:" && cin);
     cin >> p1hp >> s >> p1ammo >> s >> p1fat >> p1power;
     if (p1power == "Power:") {
       cin >> p1power;
     }
     do {
       cin >> s;
-    } while (s != "HP:");
+    } while (s != "HP:" && cin);
     cin >> p2hp >> s >> p2ammo >> s >> p2fat >> p2power;
     if (p2power == "Power:") {
       cin >> p2power;
