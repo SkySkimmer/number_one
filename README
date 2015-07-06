@@ -11,11 +11,12 @@ $ sudo apt-get install liblpsolve55-dev build-essential
 $ make
 
 Instructions (Mac OS X)
-Get lp_solve_5.5.2.0_dev_osx32.tar.gz from Sourceforge. Copy everything in the archive to the same folder as this.
+Get lp_solve_5.5.2.0_dev_osx32.tar.gz from Sourceforge and uncompress it into this folder.
 Change <lpsolve/lp_lib.h> in zs_wrap.cc to "lp_lib.h"
 In the Makefile:
   Change both instances of g++ to clang++
   Add the line LDFLAGS = -m32 to the top
+  Add -m32 after -std=c++11
   Add liblpsolve55.a after $(SRCS:.cc=.o)
   Remove -lcolamd and -llpsolve55
 Now type make into the terminal.
