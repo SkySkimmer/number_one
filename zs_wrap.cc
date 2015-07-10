@@ -1,7 +1,7 @@
 // Solves a zero-sum game using lp_solve
 #include "zs_wrap.h"
 
-#include "lp_lib.h"
+#include <lp_solve/lp_lib.h>
 #include <cstdlib>
 #include <iostream>
 
