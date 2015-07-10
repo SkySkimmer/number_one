@@ -141,7 +141,7 @@ static void solve_loop() {
 }
 
 int main() {
-  cout << "N1 bot: ver 0.1.2" << endl;
+  cout << "N1 bot: ver 0.1.3 (Untested optimizations edition)" << endl;
   cout << "Copy the match information from the N1 page (N1 Enhancer script"
           " compatible)" << endl;
 
@@ -150,7 +150,7 @@ int main() {
     cout << "Data file not found, generating..." << endl;
     dout.reset(new std::ofstream("n1bot_data.bin",
                                  std::ios::out | std::ios::binary));
-    char type1, type2;
+    int type1, type2;
     for (type1 = 0; type1 < 4; ++type1) {
       for (type2 = 0; type2 < 4; ++type2) {
         struct game_state state1 = new_game(type1, type2);
