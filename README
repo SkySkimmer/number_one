@@ -9,7 +9,7 @@ A compiler with decent C++11 support
 Instructions (for Ubuntu Linux)
 
 $ sudo apt-get install liblpsolve55-dev build-essential
-$ make
+$ make -f Makefile.ubuntu
 
 Instructions (Any unix-ish system)
 Get the appropriate dev package from the lp_solve Sourceforge and uncompress it into this folder.
