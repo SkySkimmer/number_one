@@ -159,7 +159,7 @@ void get_doubletime_strat(const struct game_state &s) {
   using std::cout;
   using std::endl;
   // Check whether the position is actually memoized
-  if (!(memoization.count(game_state_rep(s)) || memoization.count(game_state_rev_rep(s)))) {
+  if (!memoization.count(game_state_rep(s))) {
     cout << "Unreachable state" << endl;
     return;
   }
