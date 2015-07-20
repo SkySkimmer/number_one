@@ -140,6 +140,58 @@ void get_strat(const struct game_state &s) {
   }
 
   double *results = zs_solve(s.p2.bullets + 2, s.p1.bullets + 2, payoffMatrix);
+    if (results[0] - 1 < 0.000001) {
+	  // Experimental code: ignore all opponent's moves which are 100% to win,
+	  // and calculate our strategy based on that matrix.
+	  std::vector<int> badMoves;
+	  int p2MoveIdx = 0;
+	  for (int p2Move = -1; p2Move <= s.p2.bullets; p2Move++) {
+		  int offset = (p2Move + 1) * (s.p1.bullets + 2);
+		  // check whether the move is 100% winning for opponent
+		  int p1Move;
+		  for (p1Move = -1; p1Move <= s.p1.bullets; p1Move++) {
+			  if (2.0 - payoffMatrix[offset + (p1Move + 1)] > 0.000001) {
+				  // then we have a shot of winning
+				  break;
+			  }
+		  }
+		  if (p1Move <= s.p1.bullets) {
+			  badMoves.push_back(p2Move);
+		  }
+	  }
+	  if (badMoves.size() > 0) {
+		  if (badMoves.size() > 1) {
+			  free(results);  // we're calculating a new one anyway
+			  double *newPayoffMatrix = reinterpret_cast<double *>(malloc((s.p1.bullets + 2) *
+				  (badMoves.size()) *	sizeof(double)));
+			  for (unsigned i = 0; i < badMoves.size(); ++i) {
+				  int p2Move = badMoves[i];
+				  int offset = (p2Move + 1) * (s.p1.bullets + 2);
+				  for (int p1Move = -1; p1Move <= s.p1.bullets; p1Move++) {
+					  newPayoffMatrix[offset + (p1Move + 1)] = 1 +
+						  eval_state(act(s, p1Move, p2Move));
+				  }
+			  }
+			  results = zs_solve(badMoves.size(), s.p1.bullets + 2, newPayoffMatrix);
+		  }
+		  else {
+			  // no need to waste our time; take the largest element of the appropriate row
+			  int offset = badMoves[0] * (s.p1.bullets + 2);
+			  double maxWinChance = 0;
+			  int chosenMove = -1;
+			  for (int p1Move = -1; p1Move <= s.p1.bullets; p1Move++) {
+				  if (payoffMatrix[offset + (p1Move + 1)] > maxWinChance) {
+					  maxWinChance = payoffMatrix[offset + (p1Move + 1)];
+					  chosenMove = p1Move;
+				  }
+			  }
+			  // Write our choice of moves into the results array
+			  for (int i = 0; i < s.p1.bullets + 2; ++i) {
+				  results[i + 1] = (chosenMove + 1 == i);
+			  }
+		  }
+	  }
+  }
   // print out actual strategy
   /*
   cout << "Mixed-strategy subgame perfect equilibrium:" << endl;
@@ -191,8 +243,57 @@ void get_doubletime_strat(const struct game_state &s) {
   }
 
   double *results = zs_solve(s.p2.bullets + 2, s.p1.bullets + 2, payoffMatrix);
-  if (results[0] - 1 < 0.000001) {
-    cout << "Note: You are 0% to win under optimal play" << endl;
+    if (results[0] - 1 < 0.000001) {
+	  // Experimental code: ignore all opponent's moves which are 100% to win,
+	  // and calculate our strategy based on that matrix.
+	  std::vector<int> badMoves;
+	  int p2MoveIdx = 0;
+	  for (int p2Move = -1; p2Move <= s.p2.bullets; p2Move++) {
+		  int offset = (p2Move + 1) * (s.p1.bullets + 2);
+		  // check whether the move is 100% winning for opponent
+		  int p1Move;
+		  for (p1Move = -1; p1Move <= s.p1.bullets; p1Move++) {
+			  if (2.0 - payoffMatrix[offset + (p1Move + 1)] > 0.000001) {
+				  // then we have a shot of winning
+				  break;
+			  }
+		  }
+		  if (p1Move <= s.p1.bullets) {
+			  badMoves.push_back(p2Move);
+		  }
+	  }
+	  if (badMoves.size() > 0) {
+		  if (badMoves.size() > 1) {
+			  free(results);  // we're calculating a new one anyway
+			  double *newPayoffMatrix = reinterpret_cast<double *>(malloc((s.p1.bullets + 2) *
+				  (badMoves.size()) *	sizeof(double)));
+			  for (unsigned i = 0; i < badMoves.size(); ++i) {
+				  int p2Move = badMoves[i];
+				  int offset = (p2Move + 1) * (s.p1.bullets + 2);
+				  for (int p1Move = -1; p1Move <= s.p1.bullets; p1Move++) {
+					  newPayoffMatrix[offset + (p1Move + 1)] = 1 +
+						  eval_state(act(s, p1Move, p2Move));
+				  }
+			  }
+			  results = zs_solve(badMoves.size(), s.p1.bullets + 2, newPayoffMatrix);
+		  }
+		  else {
+			  // no need to waste our time; take the largest element of the appropriate row
+			  int offset = badMoves[0] * (s.p1.bullets + 2);
+			  double maxWinChance = 0;
+			  int chosenMove = -1;
+			  for (int p1Move = -1; p1Move <= s.p1.bullets; p1Move++) {
+				  if (payoffMatrix[offset + (p1Move + 1)] > maxWinChance) {
+					  maxWinChance = payoffMatrix[offset + (p1Move + 1)];
+					  chosenMove = p1Move;
+				  }
+			  }
+			  // Write our choice of moves into the results array
+			  for (int i = 0; i < s.p1.bullets + 2; ++i) {
+				  results[i + 1] = (chosenMove + 1 == i);
+			  }
+		  }
+	  }
   }
 
   double move = distribution(generator);
