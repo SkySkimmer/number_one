@@ -141,7 +141,7 @@ static void solve_loop() {
 }
 
 int main() {
-  cout << "N1 bot: ver 0.1.3 (Untested optimizations edition)" << endl;
+  cout << "N1 bot: ver 0.2.1" << endl;
   cout << "Copy the match information from the N1 page (N1 Enhancer script"
           " compatible)" << endl;
 

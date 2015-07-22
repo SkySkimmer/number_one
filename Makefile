@@ -1,7 +1,7 @@
 CC = g++
 CXX = g++
 CPPFLAGS = -MMD
-CXXFLAGS = -O3 -std=c++11
+CXXFLAGS = -g -std=c++11
 LDLIBS = -lm -ldl
 SRCS = eval_state.cc game_state.cc number_one_main.cc player.cc zs_wrap.cc
 
