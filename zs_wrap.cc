@@ -1,5 +1,5 @@
 // Solves a zero-sum game using lp_solve
-#include "zs_wrap.h"
+#include <lpsolve/lp_lib.h>
 
 #include "lp_lib.h"
 #include <cstdlib>
