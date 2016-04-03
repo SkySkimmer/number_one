@@ -2,7 +2,10 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+
+#ifdef USE_ARGP
 #include <argp.h>
+#endif
 
 using std::cin;
 using std::cerr;
@@ -148,9 +151,9 @@ string dirname(string source)
   return source;
 }
 
-
+#ifdef USE_ARGP
 const char *argp_program_version =
-  "N1 bot 0.3";
+  "N1 bot 0.3.1";
 const char *argp_program_bug_address =
   "<https://github.com/yichizhng/number_one/issues>";
 
@@ -200,22 +203,28 @@ parse_opt (int key, char *arg, struct argp_state *state)
 }
 
 static struct argp argp = { options, parse_opt, 0, doc };
+#endif //USE_ARGP
 
 int main(int argc, char** argv) {
-
+#ifdef USE_ARGP
   struct arguments arguments;
   arguments.data_path = dirname(argv[0]) + "n1bot_data.bin";
 
   argp_parse (&argp, argc, argv, 0, 0, &arguments);
 
-  cerr << "N1 bot: ver 0.3" << endl;
+  string data_path = arguments.data_path;
+#else
+  string data_path = dirname(argv[0]) + "n1bot_data.bin";
+#endif
+
+  cerr << "N1 bot: ver 0.3.1" << endl;
   cerr << "Copy the match information from the N1 page (N1 Enhancer script"
           " compatible)" << endl;
 
-  std::ifstream data_file(arguments.data_path, std::ios::in | std::ios::binary);
+  std::ifstream data_file(data_path, std::ios::in | std::ios::binary);
   if (!data_file) {
     cerr << "Data file not found, generating..." << endl;
-    dout.reset(new std::ofstream(arguments.data_path,
+    dout.reset(new std::ofstream(data_path,
                                  std::ios::out | std::ios::binary));
     int type1, type2;
     for (type1 = 0; type1 < 4; ++type1) {
