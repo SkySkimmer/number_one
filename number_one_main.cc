@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <argp.h>
 
 using std::cin;
 using std::cout;
@@ -147,17 +148,74 @@ string dirname(string source)
   return source;
 }
 
+
+const char *argp_program_version =
+  "N1 bot 0.2.1";
+const char *argp_program_bug_address =
+  "<https://github.com/yichizhng/number_one/issues>";
+
+/* Short description. */
+static char doc[] =
+  "BvS Number One bot";
+
+/* The options we understand. */
+static struct argp_option options[] = {
+  {"data",   'd', "FILE", 0,
+   "Use FILE as data file instead of 'n1bot_data.bin' next to the executable" },
+  { 0 }
+};
+
+/* Used by main to communicate with parse_opt. */
+struct arguments
+{
+  string data_path;
+};
+
+/* Parse a single option. */
+static error_t
+parse_opt (int key, char *arg, struct argp_state *state)
+{
+  /* Get the input argument from argp_parse, which we
+     know is a pointer to our arguments structure. */
+  struct arguments *arguments = (struct arguments*) state->input;
+
+  switch (key)
+    {
+    case 'd':
+      arguments->data_path = arg;
+      break;
+
+    case ARGP_KEY_ARG:
+      /* Too many arguments (ie more than 0 non option arguments). */
+      argp_usage (state);
+      break;
+
+    case ARGP_KEY_END:
+      break;
+
+    default:
+      return ARGP_ERR_UNKNOWN;
+    }
+  return 0;
+}
+
+static struct argp argp = { options, parse_opt, 0, doc };
+
 int main(int argc, char** argv) {
+
+  struct arguments arguments;
+  arguments.data_path = dirname(argv[0]) + "n1bot_data.bin";
+
+  argp_parse (&argp, argc, argv, 0, 0, &arguments);
+
   cout << "N1 bot: ver 0.2.1" << endl;
   cout << "Copy the match information from the N1 page (N1 Enhancer script"
           " compatible)" << endl;
 
-  string data_path = dirname(argv[0]) + "n1bot_data.bin";
-
-  std::ifstream data_file(data_path, std::ios::in | std::ios::binary);
+  std::ifstream data_file(arguments.data_path, std::ios::in | std::ios::binary);
   if (!data_file) {
     cout << "Data file not found, generating..." << endl;
-    dout.reset(new std::ofstream("n1bot_data.bin",
+    dout.reset(new std::ofstream(arguments.data_path,
                                  std::ios::out | std::ios::binary));
     int type1, type2;
     for (type1 = 0; type1 < 4; ++type1) {
