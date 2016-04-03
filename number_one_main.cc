@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <algorithm>
 
 using std::cin;
 using std::cout;
@@ -140,12 +141,20 @@ static void solve_loop() {
   }
 }
 
-int main() {
+string dirname(string source)
+{
+  source.erase(std::find(source.rbegin(), source.rend(), '/').base(), source.end());
+  return source;
+}
+
+int main(int argc, char** argv) {
   cout << "N1 bot: ver 0.2.1" << endl;
   cout << "Copy the match information from the N1 page (N1 Enhancer script"
           " compatible)" << endl;
 
-  std::ifstream data_file("n1bot_data.bin", std::ios::in | std::ios::binary);
+  string data_path = dirname(argv[0]) + "n1bot_data.bin";
+
+  std::ifstream data_file(data_path, std::ios::in | std::ios::binary);
   if (!data_file) {
     cout << "Data file not found, generating..." << endl;
     dout.reset(new std::ofstream("n1bot_data.bin",
