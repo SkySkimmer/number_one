@@ -150,7 +150,7 @@ string dirname(string source)
 
 
 const char *argp_program_version =
-  "N1 bot 0.2.1";
+  "N1 bot 0.3";
 const char *argp_program_bug_address =
   "<https://github.com/yichizhng/number_one/issues>";
 
@@ -208,7 +208,7 @@ int main(int argc, char** argv) {
 
   argp_parse (&argp, argc, argv, 0, 0, &arguments);
 
-  cerr << "N1 bot: ver 0.2.1" << endl;
+  cerr << "N1 bot: ver 0.3" << endl;
   cerr << "Copy the match information from the N1 page (N1 Enhancer script"
           " compatible)" << endl;
 
