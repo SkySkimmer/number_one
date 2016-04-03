@@ -5,7 +5,7 @@
 #include <argp.h>
 
 using std::cin;
-using std::cout;
+using std::cerr;
 using std::endl;
 using std::string;
 
@@ -15,19 +15,19 @@ using std::string;
 static const string type_names[] = {"Prep", "Catch", "Pierce", "Aura"};
 
 void printState(const struct game_state &state) {
-  cout << "Player 1" << endl;
-  cout << "HP: " << static_cast<int>(state.p1.hp) << endl;
-  cout << "Ammo: " << static_cast<int>(state.p1.bullets) << endl;
-  cout << "Fatigue: " << static_cast<int>(state.p1.fatigue) << endl;
-  cout << "Power: " << type_names[state.p1.type] << endl << endl;
+  cerr << "Player 1" << endl;
+  cerr << "HP: " << static_cast<int>(state.p1.hp) << endl;
+  cerr << "Ammo: " << static_cast<int>(state.p1.bullets) << endl;
+  cerr << "Fatigue: " << static_cast<int>(state.p1.fatigue) << endl;
+  cerr << "Power: " << type_names[state.p1.type] << endl << endl;
 
-  cout << "Player 2" << endl;
-  cout << "HP: " << static_cast<int>(state.p2.hp) << endl;
-  cout << "Ammo: " << static_cast<int>(state.p2.bullets) << endl;
-  cout << "Fatigue: " << static_cast<int>(state.p2.fatigue) << endl;
-  cout << "Power: " << type_names[state.p2.type] << endl << endl;
+  cerr << "Player 2" << endl;
+  cerr << "HP: " << static_cast<int>(state.p2.hp) << endl;
+  cerr << "Ammo: " << static_cast<int>(state.p2.bullets) << endl;
+  cerr << "Fatigue: " << static_cast<int>(state.p2.fatigue) << endl;
+  cerr << "Power: " << type_names[state.p2.type] << endl << endl;
 
-  cout << "Round " << static_cast<int>(state.round) << endl;
+  cerr << "Round " << static_cast<int>(state.round) << endl;
 }
 
 // MoonBurst is a lazy pony
@@ -92,7 +92,7 @@ static void solve_loop() {
   // Takes input from cin
   string argv[10];  // this array is named argv because I'm lazy
   while (true) {
-    cout << "Input position:" << endl;
+    cerr << "Input position:" << endl;
     cin >> argv[1] >> argv[2] >> argv[3] >> argv[4];
     cin >> argv[5] >> argv[6] >> argv[7] >> argv[8];
     cin >> argv[9];
@@ -136,7 +136,7 @@ static void solve_loop() {
       continue;
     }
     state1.round = stoi(argv[9]);
-    cout << endl << "Solving position (with doubletimes):" << endl;
+    cerr << endl << "Solving position (with doubletimes):" << endl;
     printState(state1);
     get_doubletime_strat(state1);
   }
@@ -208,13 +208,13 @@ int main(int argc, char** argv) {
 
   argp_parse (&argp, argc, argv, 0, 0, &arguments);
 
-  cout << "N1 bot: ver 0.2.1" << endl;
-  cout << "Copy the match information from the N1 page (N1 Enhancer script"
+  cerr << "N1 bot: ver 0.2.1" << endl;
+  cerr << "Copy the match information from the N1 page (N1 Enhancer script"
           " compatible)" << endl;
 
   std::ifstream data_file(arguments.data_path, std::ios::in | std::ios::binary);
   if (!data_file) {
-    cout << "Data file not found, generating..." << endl;
+    cerr << "Data file not found, generating..." << endl;
     dout.reset(new std::ofstream(arguments.data_path,
                                  std::ios::out | std::ios::binary));
     int type1, type2;
@@ -222,7 +222,7 @@ int main(int argc, char** argv) {
       for (type2 = 0; type2 < 4; ++type2) {
         struct game_state state1 = new_game(type1, type2);
         double winChance = eval_state(state1);
-        cout << type_names[type1] << " v " << type_names[type2] << '\t'
+        cerr << type_names[type1] << " v " << type_names[type2] << '\t'
              << winChance << endl;
       }
     }
@@ -251,8 +251,8 @@ int main(int argc, char** argv) {
       }
       memoization[state] = winchance;
     }
-    cout << "Read " << nstates << " states from data file" << endl;
+    cerr << "Read " << nstates << " states from data file" << endl;
   }
-  cout << "Finished initializing." << endl;
+  cerr << "Finished initializing." << endl;
   moonburst_loop();
 }
