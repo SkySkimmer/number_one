@@ -1,6 +1,6 @@
 CC = g++
 CXX = g++
-CPPFLAGS = -MMD
+CPPFLAGS = -MMD -DUSE_ARGP
 CXXFLAGS = -O3 -std=c++11
 LDLIBS = -Wl,--no-as-needed -lcolamd -lm -ldl -llpsolve55
 SRCS = eval_state.cc game_state.cc number_one_main.cc player.cc zs_wrap.cc

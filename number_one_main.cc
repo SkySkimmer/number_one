@@ -1,9 +1,14 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <algorithm>
+
+#ifdef USE_ARGP
+#include <argp.h>
+#endif
 
 using std::cin;
-using std::cout;
+using std::cerr;
 using std::endl;
 using std::string;
 
@@ -13,19 +18,19 @@ using std::string;
 static const string type_names[] = {"Prep", "Catch", "Pierce", "Aura"};
 
 void printState(const struct game_state &state) {
-  cout << "Player 1" << endl;
-  cout << "HP: " << static_cast<int>(state.p1.hp) << endl;
-  cout << "Ammo: " << static_cast<int>(state.p1.bullets) << endl;
-  cout << "Fatigue: " << static_cast<int>(state.p1.fatigue) << endl;
-  cout << "Power: " << type_names[state.p1.type] << endl << endl;
+  cerr << "Player 1" << endl;
+  cerr << "HP: " << static_cast<int>(state.p1.hp) << endl;
+  cerr << "Ammo: " << static_cast<int>(state.p1.bullets) << endl;
+  cerr << "Fatigue: " << static_cast<int>(state.p1.fatigue) << endl;
+  cerr << "Power: " << type_names[state.p1.type] << endl << endl;
 
-  cout << "Player 2" << endl;
-  cout << "HP: " << static_cast<int>(state.p2.hp) << endl;
-  cout << "Ammo: " << static_cast<int>(state.p2.bullets) << endl;
-  cout << "Fatigue: " << static_cast<int>(state.p2.fatigue) << endl;
-  cout << "Power: " << type_names[state.p2.type] << endl << endl;
+  cerr << "Player 2" << endl;
+  cerr << "HP: " << static_cast<int>(state.p2.hp) << endl;
+  cerr << "Ammo: " << static_cast<int>(state.p2.bullets) << endl;
+  cerr << "Fatigue: " << static_cast<int>(state.p2.fatigue) << endl;
+  cerr << "Power: " << type_names[state.p2.type] << endl << endl;
 
-  cout << "Round " << static_cast<int>(state.round) << endl;
+  cerr << "Round " << static_cast<int>(state.round) << endl;
 }
 
 // MoonBurst is a lazy pony
@@ -90,7 +95,7 @@ static void solve_loop() {
   // Takes input from cin
   string argv[10];  // this array is named argv because I'm lazy
   while (true) {
-    cout << "Input position:" << endl;
+    cerr << "Input position:" << endl;
     cin >> argv[1] >> argv[2] >> argv[3] >> argv[4];
     cin >> argv[5] >> argv[6] >> argv[7] >> argv[8];
     cin >> argv[9];
@@ -134,28 +139,99 @@ static void solve_loop() {
       continue;
     }
     state1.round = stoi(argv[9]);
-    cout << endl << "Solving position (with doubletimes):" << endl;
+    cerr << endl << "Solving position (with doubletimes):" << endl;
     printState(state1);
     get_doubletime_strat(state1);
   }
 }
 
-int main() {
-  cout << "N1 bot: ver 0.2.1" << endl;
-  cout << "Copy the match information from the N1 page (N1 Enhancer script"
+string dirname(string source)
+{
+  source.erase(std::find(source.rbegin(), source.rend(), '/').base(), source.end());
+  return source;
+}
+
+#ifdef USE_ARGP
+const char *argp_program_version =
+  "N1 bot 0.3.1";
+const char *argp_program_bug_address =
+  "<https://github.com/yichizhng/number_one/issues>";
+
+/* Short description. */
+static char doc[] =
+  "BvS Number One bot";
+
+/* The options we understand. */
+static struct argp_option options[] = {
+  {"data",   'd', "FILE", 0,
+   "Use FILE as data file instead of 'n1bot_data.bin' next to the executable" },
+  { 0 }
+};
+
+/* Used by main to communicate with parse_opt. */
+struct arguments
+{
+  string data_path;
+};
+
+/* Parse a single option. */
+static error_t
+parse_opt (int key, char *arg, struct argp_state *state)
+{
+  /* Get the input argument from argp_parse, which we
+     know is a pointer to our arguments structure. */
+  struct arguments *arguments = (struct arguments*) state->input;
+
+  switch (key)
+    {
+    case 'd':
+      arguments->data_path = arg;
+      break;
+
+    case ARGP_KEY_ARG:
+      /* Too many arguments (ie more than 0 non option arguments). */
+      argp_usage (state);
+      break;
+
+    case ARGP_KEY_END:
+      break;
+
+    default:
+      return ARGP_ERR_UNKNOWN;
+    }
+  return 0;
+}
+
+static struct argp argp = { options, parse_opt, 0, doc };
+#endif //USE_ARGP
+
+int main(int argc, char** argv) {
+#ifdef USE_ARGP
+  struct arguments arguments;
+  arguments.data_path = dirname(argv[0]) + "n1bot_data.bin";
+
+  argp_parse (&argp, argc, argv, 0, 0, &arguments);
+
+  string data_path = arguments.data_path;
+#else
+  string data_path = dirname(argv[0]) + "n1bot_data.bin";
+#endif
+
+  cerr << "N1 bot: ver 0.3.1" << endl;
+  cerr << "Copy the match information from the N1 page (N1 Enhancer script"
           " compatible)" << endl;
 
-  std::ifstream data_file("n1bot_data.bin", std::ios::in | std::ios::binary);
+  std::ifstream data_file(data_path, std::ios::in | std::ios::binary);
   if (!data_file) {
-    cout << "Data file not found, generating..." << endl;
-    dout.reset(new std::ofstream("n1bot_data.bin",
+    cerr << "Data file not found, generating..." << endl;
+    dout.reset(new std::ofstream(data_path,
                                  std::ios::out | std::ios::binary));
     int type1, type2;
     for (type1 = 0; type1 < 4; ++type1) {
       for (type2 = 0; type2 < 4; ++type2) {
         struct game_state state1 = new_game(type1, type2);
         double winChance = eval_state(state1);
-        cout << type_names[type1] << " v " << type_names[type2] << '\t'
+        cerr << type_names[type1] << " v " << type_names[type2] << '\t'
              << winChance << endl;
       }
     }
@@ -184,8 +260,8 @@ int main() {
       }
       memoization[state] = winchance;
     }
-    cout << "Read " << nstates << " states from data file" << endl;
+    cerr << "Read " << nstates << " states from data file" << endl;
   }
-  cout << "Finished initializing." << endl;
+  cerr << "Finished initializing." << endl;
   moonburst_loop();
 }
