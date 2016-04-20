@@ -1,5 +1,6 @@
 #include "eval_state.h"
 
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <random>
@@ -106,7 +107,7 @@ double eval_state(const struct game_state &s) {
 
 namespace {
   std::random_device rd;
-  std::default_random_engine generator(rd());
+  std::ranlux48 generator(rd.entropy() ? rd() : std::chrono::system_clock::now().time_since_epoch().count());
   std::uniform_real_distribution<double> distribution(0.0, 1.0);
 }
 

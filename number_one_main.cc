@@ -153,7 +153,7 @@ string dirname(string source)
 
 #ifdef USE_ARGP
 const char *argp_program_version =
-  "N1 bot 0.3.1";
+  "N1 bot 0.3.2";
 const char *argp_program_bug_address =
   "<https://github.com/yichizhng/number_one/issues>";
 
