@@ -1,0 +1,7 @@
+{
+  "name": "number_one",
+  "description": "Compute optimal play for BvS number one minigame",
+  "path": "/usr/local/bin/number_one_wrapper.py",
+  "type": "stdio",
+  "allowed_extensions": [ "@bvsn1runner" ]
+}

@@ -153,7 +153,7 @@ string dirname(string source)
 
 #ifdef USE_ARGP
 const char *argp_program_version =
-  "N1 bot 0.3.2";
+  "N1 bot 0.4.1";
 const char *argp_program_bug_address =
   "<https://github.com/yichizhng/number_one/issues>";
 
@@ -217,7 +217,7 @@ int main(int argc, char** argv) {
   string data_path = dirname(argv[0]) + "n1bot_data.bin";
 #endif
 
-  cerr << "N1 bot: ver 0.3.1" << endl;
+  cerr << "N1 bot: ver 0.4.1" << endl;
   cerr << "Copy the match information from the N1 page (N1 Enhancer script"
           " compatible)" << endl;
 
