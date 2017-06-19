@@ -1,14 +1,17 @@
 CC = g++
 CXX = g++
-CPPFLAGS = -MMD -DUSE_ARGP
+CPPFLAGS = -MMD
 CXXFLAGS = -O3 -std=c++11
 LDLIBS = -Wl,--no-as-needed -lcolamd -lm -ldl -llpsolve55
 SRCS = eval_state.cc game_state.cc number_one_main.cc player.cc zs_wrap.cc
 
 number_one_main: $(SRCS:.cc=.o)
 
+states.json: number_one_main
+	./number_one_main | tr -s "[:space:]" | sed 's/ //g' > $@
+
 clean:
-	rm -f number_one_main *.o *~
+	rm -f number_one_main *.o *~ states.json
 
 .PHONY: clean
 
