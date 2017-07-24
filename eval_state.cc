@@ -16,11 +16,17 @@
 std::unordered_map<int, double> memoization;
 
 bool has_printed = false;
+
 const std::string quote = "\"";
-const std::string tab = "    ";
+
+// indent or no indent?
+// const std::string tab = "    ";
+// const std::string colon = " : ";
+const std::string tab = "";
+const std::string colon = ":";
 
 // Computes the probability that the first player will win
-double eval_state(const struct game_state &s) {
+double eval_state(const struct game_state &s, std::ofstream &states, std::ofstream &wins) {
   int state_rep = game_state_rep(s);
   if (memoization.count(state_rep)) {
     // already calculated; return memoized result
@@ -44,7 +50,7 @@ double eval_state(const struct game_state &s) {
 
   // Autoload if neither player has a bullet
   if (s.p1.bullets == 0 && s.p2.bullets == 0) {
-    double res = eval_state(act(s, -1, -1));
+    double res = eval_state(act(s, -1, -1), states, wins);
     return res;
   }
 
@@ -60,7 +66,7 @@ double eval_state(const struct game_state &s) {
     int offset = (p2Move + 1) * (s.p1.bullets + 2);
     for (int p1Move = -1; p1Move <= s.p1.bullets; p1Move++) {
       payoffMatrix[offset + (p1Move + 1)] = 1 +
-        eval_state(act(s, p1Move, p2Move));
+        eval_state(act(s, p1Move, p2Move), states, wins);
       // adding offset of 1 to avoid some rounding problems
     }
   }
@@ -85,20 +91,21 @@ double eval_state(const struct game_state &s) {
 
   // print json
   if (has_printed) {
-    std::cout << "," << std::endl;
+    states << "," << std::endl;
   }
   has_printed = true;
-  std::cout << tab << quote << state_rep << quote << " : {" << std::endl;
+  states << tab << quote << state_rep << quote << colon << "{" << std::endl;
   for (int p1Move = -1; p1Move <= s.p1.bullets; ++p1Move) {
     // results: 0 => win chance, 1 => reload proba, ...
     // so -1 => 1
-    std::cout << tab << tab << quote << p1Move << quote << " : " << results[p1Move+2];
+    states << tab << tab << quote << p1Move << quote << colon << results[p1Move+2];
     if (p1Move < s.p1.bullets)
-      std::cout << ",";
-    std::cout << std::endl;
+      states << ",";
+    states << std::endl;
   }
-  std::cout << tab << "}";
+  states << tab << "}";
 
+  wins << state_rep << colon << results[0] << std::endl;
 
   double value = results[0];
   free(results);

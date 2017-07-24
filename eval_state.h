@@ -8,7 +8,7 @@
 
 #include "game_state.h"
 
-double eval_state(const struct game_state &s);
+double eval_state(const struct game_state &s, std::ofstream &states, std::ofstream &wins);
 
 extern std::unordered_map<int, double> memoization;
 
